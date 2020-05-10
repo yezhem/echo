@@ -18,30 +18,32 @@
 
 static const char* program = __FILE__;
 
+int doEcho(int fd, sockaddr_in client) {
+  char buffer[4096];
+  while(true) {
+    ssize_t sRecv = recv(fd, (void*)buffer, MAX_BUFFER, 0);
+    if(sRecv == 0) {
+      break;
+    }
+    if(sRecv == -1) {
+      exit(ERR_RECV);
+    }
+    ssize_t sSend = send(fd, buffer, sRecv,0);
+  }
+  close(fd);
+}
+
 // single thread server - 单线程模式
 int run(int iSockfd) {
-  char buffer[4096];
   // 循环创建链接
+  struct sockaddr_in sClient;
+  socklen_t sLen = 0;
   while(true) {
-    struct sockaddr_in sClient;
-    socklen_t sLen = sizeof(sClient);
-    int fd = accept(iSockfd, (struct sockaddr*)&sClient, &sLen);
+    int fd = accept(iSockfd, nullptr, nullptr);
     if(fd < 0) {
       exit(ERR_ACCEPT);
     }
-    std::cout << "accept the port:" << sClient.sin_port << std::endl;
-    while(true) {
-      ssize_t sRecv = recv(fd, (void*)buffer, MAX_BUFFER, 0);
-      if(sRecv == 0) {
-        std::cout << "close the port:" << sClient.sin_port << std::endl;
-        break;
-      }
-      if(sRecv == -1) {
-        exit(ERR_RECV);
-      }
-      ssize_t sSend = send(fd, buffer, sRecv,0);
-    }
-    close(fd);
+    doEcho(fd, sClient);
   }
   return RUN_OK;
 }
