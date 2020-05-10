@@ -18,7 +18,7 @@
 
 static const char* program = __FILE__;
 
-int doEcho(int fd, sockaddr_in client) {
+int doEcho(int fd) {
   char buffer[4096];
   while(true) {
     ssize_t sRecv = recv(fd, (void*)buffer, MAX_BUFFER, 0);
@@ -28,22 +28,21 @@ int doEcho(int fd, sockaddr_in client) {
     if(sRecv == -1) {
       exit(ERR_RECV);
     }
-    ssize_t sSend = send(fd, buffer, sRecv,0);
+    send(fd, buffer, sRecv,0);
   }
   close(fd);
+  return RUN_OK;
 }
 
 // single thread server - 单线程模式
 int run(int iSockfd) {
   // 循环创建链接
-  struct sockaddr_in sClient;
-  socklen_t sLen = 0;
   while(true) {
     int fd = accept(iSockfd, nullptr, nullptr);
     if(fd < 0) {
       exit(ERR_ACCEPT);
     }
-    doEcho(fd, sClient);
+    doEcho(fd);
   }
   return RUN_OK;
 }

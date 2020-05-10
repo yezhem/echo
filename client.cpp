@@ -27,7 +27,7 @@ int run(int fd) {
     std::cout << "> ";
     std::cin.getline(sIn, sizeof(sIn));
     // 发送消息
-    ssize_t sSend = send(fd, sIn, strlen(sIn), 0);
+    send(fd, sIn, strlen(sIn), 0);
     // 接收消息
     ssize_t sRecv = recv(fd, (void*)buffer, MAX_BUFFER, 0);
     buffer[sRecv] = '\0';

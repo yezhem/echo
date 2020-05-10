@@ -1,5 +1,5 @@
 CXX := g++
-CFLAGS := -std=c++17
+CFLAGS := -std=c++17 -pthread -W{error,all}
 
 SOURCE := $(wildcard *.cpp)
 OBJ := $(basename $(notdir $(SOURCE)))
