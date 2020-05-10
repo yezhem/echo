@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     const char *pos = strchr(program, '.');
     strcpy(cmd, program);
     cmd[pos - program] = '\0';
-    std::cerr << "error argument, to using:./" << cmd << " [port]" << std::endl;
+    std::cerr << "usage: ./" << cmd << " [port]" << std::endl;
     exit(ERR_ARG);
   }
   // 读取端口

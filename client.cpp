@@ -18,7 +18,7 @@
 #define MAX_BUFFER 4096
 
 static const char* program = __FILE__;
-static const char* errArg = "error argument, to using ./client [ip] [port]\n";
+static const char* errArg = "usage: ./client [ip] [port]\n";
 
 int run(int fd) {
   char buffer[MAX_BUFFER];
