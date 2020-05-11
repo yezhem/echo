@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <thread>
 
 #define RUN_OK     0
 #define ERR_ARG    1
@@ -34,7 +35,7 @@ int doEcho(int fd) {
   return RUN_OK;
 }
 
-// single thread server - 单线程模式
+// multi thread server - 多线程模式
 int run(int iSockfd) {
   // 循环创建链接
   while(true) {
@@ -42,7 +43,8 @@ int run(int iSockfd) {
     if(fd < 0) {
       exit(ERR_ACCEPT);
     }
-    doEcho(fd);
+    std::thread tEcho(doEcho, fd);
+    tEcho.detach();
   }
   return RUN_OK;
 }
