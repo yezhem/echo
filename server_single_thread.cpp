@@ -16,6 +16,7 @@
 
 #define MAX_BUFFER 4096
 
+static const int BACKLOG   = 5;
 static const char* program = __FILE__;
 
 int doEcho(int fd) {
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]) {
     exit(ERR_BIND);
   }
   // 开始监听
-  if(listen(iSockfd, 16) < 0) {
+  if(listen(iSockfd, BACKLOG) < 0) {
     exit(ERR_LISTEN);
   }
 
