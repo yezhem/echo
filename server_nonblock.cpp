@@ -1,47 +1,41 @@
 #include "common.h"
 
 #include <fcntl.h>
-#include <thread>
 
-#include "SynchronizedQueue.h"
-
-constexpr int MAX_FD = 1000;
-
-static SynchronizedQueue<int> fdQueue(MAX_FD);
-
-// 非阻塞应答
-int doNonBlockEcho() {
-  char buffer[MAX_BUFFER];
-  while(true) {
-    int fd = fdQueue.pop();
-    ssize_t sRecv = recv(fd, buffer, sizeof(buffer), 0);
-    if(sRecv == 0) {
-      close(fd);
-      continue;
-    }else if(sRecv < 0) {
-      if(errno != EAGAIN) {
-        std::cerr << "error to recv" << std::endl;
-        continue;
-      }
-    }else {
-      send(fd, buffer, sRecv, 0);
-    }
-    fdQueue.push(fd);
-  }
-}
+#include <vector>
 
 // nonblock - 非阻塞模式
 int run(int iSockfd) {
-  std::thread echo(doNonBlockEcho);
-  echo.detach();
+  std::vector<int> fdList;
+  char buffer[MAX_BUFFER];
+
+  fcntl(iSockfd, F_SETFL, O_NONBLOCK);
 
   while(true) {
     int fd = accept(iSockfd, nullptr, nullptr);
-    if(fd < 0) {
+    if(fd < 0 && errno != EAGAIN) {
       exit(ERR_ACCEPT);
+    } else if(fd > 0) {
+      fcntl(fd, F_SETFL, O_NONBLOCK);
+      fdList.push_back(fd);
     }
-    fcntl(fd, F_SETFL, O_NONBLOCK);
-    fdQueue.push(fd);
+    // nonblock echo
+    for(auto it = fdList.begin(); it != fdList.end(); ) {
+      ssize_t sRecv = recv(*it, buffer, sizeof(buffer), 0);
+      if(sRecv == 0) {
+        close(*it);
+        it = fdList.erase(it);
+      }else if(sRecv < 0 && errno != EAGAIN) {
+        std::cerr << "error to recv" << std::endl;
+        it = fdList.erase(it);
+      }else if(sRecv < 0) {
+        ++it;
+      }else {
+        send(*it, buffer, sRecv, 0);
+        ++it;
+      }
+    }
   }
+
   return RUN_OK;
 }
