@@ -4,6 +4,8 @@
 
 #include <vector>
 
+const char* program  = __FILE__;
+
 // nonblock - 非阻塞模式
 int run(int iSockfd) {
   std::vector<int> fdList;

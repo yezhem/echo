@@ -1,5 +1,7 @@
 #include "common.h"
 
+const char* program  = __FILE__;
+
 // single thread server - 单线程模式
 int run(int iSockfd) {
   // 循环创建链接

@@ -2,6 +2,7 @@
 
 #include "ThreadPool.h"
 
+const char* program  = __FILE__;
 static const int iThread = 16;
 
 // thread pool server - 线程池模式

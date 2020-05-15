@@ -2,6 +2,8 @@
 
 #include <thread>
 
+const char* program  = __FILE__;
+
 // multi thread server - 多线程模式
 int run(int iSockfd) {
   // 循环创建链接

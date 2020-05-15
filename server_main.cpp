@@ -1,6 +1,6 @@
 #include "common.h"
 
-static const char* program  = __FILE__;
+extern const char* program;
 
 // 服务端处理函数
 int doEcho(int fd) {
