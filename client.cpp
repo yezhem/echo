@@ -17,7 +17,6 @@
 
 #define MAX_BUFFER 4096
 
-static const char* program = __FILE__;
 static const char* errArg = "usage: ./client [ip] [port]\n";
 
 int run(int fd) {
@@ -45,10 +44,6 @@ int main(int argc, char *argv[]) {
   in_addr_t iIp = 0;
   // 解析参数
   if(argc < 3) {
-    const char *pos = strchr(program, '.');
-    char cmd[32];
-    strcpy(cmd, program);
-    cmd[pos - program] = '\0';
     std::cerr << errArg;
     exit(ERR_ARG);
   }
