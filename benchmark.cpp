@@ -4,8 +4,10 @@
 
 #include <unistd.h>
 
+#include <algorithm>
 #include <iostream>
 #include <cstring>
+#include <climits>
 
 #include "ThreadPool.h"
 
@@ -34,7 +36,7 @@ void exitErr(const char* info, int ret) {
 }
 
 result_t client(int socketNum, int requestNum) {
-  result_t ret;
+  result_t ret = {0};
   std::vector<int> fds(socketNum, 0);
 
   for(int i = 0; i < socketNum; ++i) {
@@ -51,10 +53,11 @@ result_t client(int socketNum, int requestNum) {
     if(connect(fds[i], (struct sockaddr*)pServer, sizeof(*pServer))) {
       std::cerr << "connet error fd:" << fds[i] << std::endl;
     }
-    send(fds[i], buffer, sizeof(buffer), 0);
-    recv(fds[i], (void*)recvBuffer, 4096, 0);
-    if(!strcmp(buffer, recvBuffer)) { ret.iSuccess++; }
-    memset(recvBuffer, 0, sizeof(recvBuffer));
+    for(int kase = 0; kase < requestNum; ++kase) {
+      send(fds[i], buffer, sizeof(buffer), 0);
+      recv(fds[i], (void*)recvBuffer, 4096, 0);
+      if(!strcmp(buffer, recvBuffer)) { ret.iSuccess++; }
+    }
     close(fds[i]);
   }
   auto endT = std::chrono::system_clock::now();
@@ -99,9 +102,19 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < iThreadNum; ++i) {
     rets.push_back(tp.addTask(client, iSocketNum, iRequestNum));
   }
-  for(int i = 0; i <iThreadNum; ++i) {
+
+  long long avgTime = 0;
+  long long maxTime = 0;
+  long long minTime = LONG_MAX;
+  for(int i = 0; i < iThreadNum; ++i) {
     auto result = rets[i].get();
     std::cout << "thread " << i << ":" << result.iSuccess << " " << result.lTime << std::endl;
+    maxTime = std::max(maxTime, result.lTime);
+    minTime = std::min(minTime, result.lTime);
+    avgTime += result.lTime;
   }
+  std::cout << "max time:" << maxTime <<
+    "\nmin time:" << minTime <<
+    "\navg time:" << avgTime / iThreadNum << std::endl;
   return 0;
 }
