@@ -3,7 +3,7 @@
 #include "ThreadPool.h"
 
 const char* program  = __FILE__;
-static const int iThread = 16;
+static const int iThread = 1024;
 
 // thread pool server - 线程池模式
 int run(int iSockfd) {

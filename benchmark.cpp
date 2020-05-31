@@ -53,6 +53,8 @@ result_t client(int socketNum, int requestNum) {
     if(connect(fds[i], (struct sockaddr*)pServer, sizeof(*pServer))) {
       std::cerr << "connet error fd:" << fds[i] << std::endl;
     }
+  }
+  for(int i = 0; i < socketNum; ++i) {
     for(int kase = 0; kase < requestNum; ++kase) {
       send(fds[i], buffer, sizeof(buffer), 0);
       recv(fds[i], (void*)recvBuffer, 4096, 0);
@@ -87,9 +89,9 @@ int main(int argc, char *argv[]) {
   if(iRequestNum == -1) { exitErr(errArg, ERR_ARG); }
   std::cout << 
       "connect to:" << argv[1] << ":" << argv[2] << 
-      "\ncreate thread:         " << argv[3] << 
-      "\nthread open socket:    " << argv[4] << 
-      "\nsocket handle request: " << argv[5] << std::endl;
+      "\ncreate thread:         "     << argv[3] << 
+      "\nopen socket per thread:    " << argv[4] << 
+      "\nsocket handle request: "     << argv[5] << std::endl;
   // 创建链接地址
   pServer = (struct sockaddr_in*)calloc(1, sizeof(*pServer));
   if(pServer == nullptr) { exitErr(errArg, ERR_ARG); }
